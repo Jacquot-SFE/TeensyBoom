@@ -1,5 +1,5 @@
-#ifndef __TEENSY_BOOM_VOICE_LIBRARY_H__
-#define __TEENSY_BOOM_VOICE_LIBRARY_H__
+#ifndef __TEENSY_BOOM_VOICE_LIBRARY_H_
+#define __TEENSY_BOOM_VOICE_LIBRARY_H_
 
 #pragma once
 

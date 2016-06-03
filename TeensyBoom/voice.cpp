@@ -1,11 +1,13 @@
 #include "voice.h"
 
-#include "Synth-Clatter.h"
-#include "Synth-Decay.h"
-#include "Synth-DrumHeart.h"
-#include "synth_simple_drum.h"
+#include <TeensyBoomVoiceLibrary.h>
 
-#include "player.h"
+//#include "Synth-Clatter.h"
+//#include "Synth-Decay.h"
+//#include "Synth-DrumHeart.h"
+//#include "synth_simple_drum.h"
+
+#include "player.h"  // required so we can update tempo param from knob update func.
 
 extern Player thePlayer;
 

@@ -1,3 +1,9 @@
+#include <Synth-Clatter.h>
+#include <Synth-Decay.h>
+#include <Synth-DrumHeart.h>
+#include <synth_simple_drum.h>
+#include <TeensyBoomVoiceLibrary.h>
+
 #include <Audio.h>
 #include <Wire.h>
 #include <SPI.h>
@@ -23,7 +29,7 @@ void setup() {
   // put your setup code here, to run once:
 
   Serial.begin(115200);
- 
+
   delay(1500);
 
   Serial.println("Setup");
@@ -39,17 +45,17 @@ void setup() {
   // to OFF.  Gotta do it before SD init, else the panels contend!
   theScanner.initScanning();
 
-  
-  if (!(SD.begin(10))) 
+
+  if (!(SD.begin(10)))
   {
     Serial.println("Unable to access the SD card");
   }
   else
   {
-    Serial.println("SD card begin worked");    
+    Serial.println("SD card begin worked");
   }
 
-  if(SD.exists("test.txt"))
+  if (SD.exists("test.txt"))
   {
     Serial.println("found test.txt file");
   }
@@ -76,11 +82,11 @@ void setup() {
   Serial.println("Setup Complete");
 }
 
-void loop() 
+void loop()
 {
   uint32_t now = millis();
   static uint32_t then;
-  
+
 #if 1
   // put your main code here, to run repeatedly:
 
@@ -88,21 +94,21 @@ void loop()
   paramUpdate2();// toms, shaker
   paramUpdate3();// master volume & tempo
 
-  if(now > then)
+  if (now > then)
   {
     thePlayer.tick();
   }
 
-  if(now % 5 == 0)
+  if (now % 5 == 0)
   {
     theScanner.tick();
   }
 
-  if(now % 5000 == 0)
+  if (now % 5000 == 0)
   {
     //theScanner.dumpLEDs();
 
-    
+
     Serial.print("Diagnostics: ");
     Serial.print(" max, buffs: ");
     Serial.print(AudioProcessorUsageMax());
@@ -112,5 +118,5 @@ void loop()
   }
 
   then = now;
-#endif  
+#endif
 }
