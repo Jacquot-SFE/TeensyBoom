@@ -42,7 +42,7 @@ public:
     env_sqr_current = 0;
     //length(1000);
   }
-  void noteOn();
+  void noteOn(int16_t topval = 0x7fff);
 
   void length(int32_t milliseconds)
   {

@@ -49,10 +49,9 @@ public:
     length(1000);
     frequency(60);
     pitchMod(0x200);
-    wav_amplitude1 = 0x7fff;
-    wav_amplitude2 = 0;
+    wav_second= false;
   }
-  void noteOn();
+  void noteOn(int16_t topval = 0x7fff);
 
   void frequency(float freq)
   {
@@ -65,8 +64,12 @@ public:
     wav_increment = (freq * (0x7fffffffLL/AUDIO_SAMPLE_RATE_EXACT)) + 0.5;
   }
 
-  void secondMix(float level);
-  void pitchMod(float depth);
+  void second(bool setting)
+  {
+    wav_second = setting;
+  }
+
+  void pitchMod(int32_t depth);
 
   void length(int32_t milliseconds)
   {
@@ -80,7 +83,11 @@ public:
 
     int32_t len_samples = milliseconds*(AUDIO_SAMPLE_RATE_EXACT/1000.0);
 
+//    __disable_irq();    
+
     env_decrement = (0x7fff0000/len_samples);
+    
+//    __enable_irq();    
   };
 
   void waveshape(int32_t shape)
@@ -94,7 +101,7 @@ public:
       wav_shape = shape;
     }
   };
-
+  
   using AudioStream::release;
   virtual void update(void);
 
@@ -107,6 +114,7 @@ public:
   // Waveform params
   uint32_t wav_phasor;     // 
   uint32_t wav_phasor2;     // 
+  bool     wav_second;
   uint32_t wav_increment;
   int32_t  wav_pitch_mod;
   int32_t  wav_shape;
@@ -114,8 +122,8 @@ public:
 private:
   audio_block_t *inputQueueArray[1];
 
-  int16_t wav_amplitude1;
-  int16_t wav_amplitude2;
+  //int32_t current; // present value
+  //int32_t increment; // (actually, decrement, how each sample deviates from previous.)
 
 };
 

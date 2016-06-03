@@ -27,12 +27,12 @@
 #include "Synth-Decay.h"
 
 
-void AudioSynthDecay::noteOn(void)
+void AudioSynthDecay::noteOn(int16_t topval)
 {
   //Serial.println("Decay noteOn");
 //  __disable_irq();
 
-  env_lin_current = 0x7fff0000;
+  env_lin_current = (topval << 16);
   
 //  __enable_irq();
 }
