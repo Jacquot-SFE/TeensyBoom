@@ -111,6 +111,14 @@ void StepEdit::HandleKey(uint32_t keynum, bool pressed)
     if(pressed)
     {
       setting = thePattern.toggleBit(keynum);
+
+      // If we're clearing a bit, lose it's accent, too.
+      if(!setting)
+      {
+        if(thePattern.getAccentBit(keynum))
+          thePattern.toggleAccentBit(keynum);
+      }
+      
       setLEDs(true);
     }
   }

@@ -27,6 +27,7 @@ public:
   int32_t getPendingPattern();
 
   int32_t getCurrentStep();
+  bool    getBlinkPhase();
 
   void tick();
 

@@ -54,10 +54,6 @@ private:
   uint8_t old_buttons[NUM_PANELS];
   uint8_t new_buttons[NUM_PANELS];
 
-  uint32_t tick_counter;
-  bool     blink_phase;
-  bool     slow_blink;
-
 };
 
 

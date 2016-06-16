@@ -152,6 +152,18 @@ int32_t Player::getCurrentStep()
   return current_step;
 }
 
+bool Player::getBlinkPhase()
+{
+  uint32_t now = millis();
+  
+  if(now < (next_time - (pause_len>>1)))
+  {
+    return true;
+  }
+  return false;
+
+}
+
 ////////////////////////////////////////////////////////////////
 // chain stuff
 ////////////////////////////////////////////////////////////////
@@ -237,11 +249,6 @@ void Player::tick()
 {
   uint32_t now = millis();
   
-  if(!playing)
-  {
-    return;  
-  }
-
   if(now < next_time)
   {
     return;
@@ -263,69 +270,67 @@ void Player::tick()
     }
   }
 
-  
-   
-  //
-  uint32_t trigdata = thePattern.getStepData(current_step);
+  if(playing)
+  {
+    uint32_t trigdata = thePattern.getStepData(current_step);
 
-  // Apply mutes
-  trigdata &= (~active_mutes);
+    // Apply mutes
+    trigdata &= (~active_mutes);
 
-  theEditor.forceLEDs();
+    theEditor.forceLEDs();
 
 #if 1
-  Serial.print("Trigger: step#");
-  Serial.print(current_step);
-  Serial.print(" bitmap:");
-  Serial.println(trigdata, HEX);
+   Serial.print("Trigger: step#");
+   Serial.print(current_step);
+   Serial.print(" bitmap:");
+   Serial.println(trigdata, HEX);
 #endif
 
-  AudioNoInterrupts();
+    AudioNoInterrupts();
 
-  if (trigdata & 0x01)
-  {
-    triggerKick(trigdata & 0x010000);
+    if (trigdata & 0x01)
+    {
+      triggerKick(trigdata & 0x010000);
+    }
+    if (trigdata & 0x02)
+    {
+      triggerSnare(trigdata & 0x020000);
+    }
+    if (trigdata & 0x04)
+    {
+      // closed hat trumps open hat.
+      triggerHat(false, trigdata & 0x040000);
+    }
+    else if (trigdata & 0x08)
+    {
+      triggerHat(true, trigdata & 0x080000);  
+    }
+    if (trigdata & 0x10)
+    {
+      triggerTom(1, trigdata & 0x100000);
+    }
+    else if (trigdata & 0x20)
+    {
+      triggerTom(2, trigdata & 0x200000);
+    } 
+    else if (trigdata & 0x40)
+    {
+      triggerTom(3, trigdata & 0x400000);
+    }
+    if (trigdata & 0x80)
+    {
+      triggerBell(trigdata & 0x800000);
+    }
+    if (trigdata & 0x100)
+    {
+      triggerShaker(trigdata & 0x1000000);
+    }
+    if (trigdata & 0x200)
+    {
+      triggerCymbal(trigdata & 0x2000000);
+    }
+    AudioInterrupts();
   }
-  if (trigdata & 0x02)
-  {
-    triggerSnare(trigdata & 0x020000);
-  }
-  if (trigdata & 0x04)
-  {
-    // closed hat trumps open hat.
-    triggerHat(false, trigdata & 0x040000);
-  }
-  else if (trigdata & 0x08)
-  {
-    triggerHat(true, trigdata & 0x080000);  
-  }
-  if (trigdata & 0x10)
-  {
-    triggerTom(1, trigdata & 0x100000);
-  }
-  else if (trigdata & 0x20)
-  {
-    triggerTom(2, trigdata & 0x200000);
-  } 
-  else if (trigdata & 0x40)
-  {
-    triggerTom(3, trigdata & 0x400000);
-  }
-  if (trigdata & 0x80)
-  {
-    triggerBell(trigdata & 0x800000);
-  }
-  if (trigdata & 0x100)
-  {
-    triggerShaker(trigdata & 0x1000000);
-  }
-  if (trigdata & 0x200)
-  {
-    triggerCymbal(trigdata & 0x2000000);
-  }
-  
-
-  AudioInterrupts();
 
   current_step++;
   if(current_step >= 0x10)

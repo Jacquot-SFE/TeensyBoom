@@ -2,13 +2,15 @@
 #include <arduino.h>
 
 #include "panel-scanner.h"
+#include "player.h"
 
 static const int32_t CHIPSEL_BTNS = 8;
 static const int32_t CHIPSEL_LEDS = 5;
 
 extern Editor       theEditor;
+extern Player       thePlayer;
 
-static const SPISettings registersettings(500000, MSBFIRST, SPI_MODE0 );
+static const SPISettings registersettings(1000000, MSBFIRST, SPI_MODE0 );
 
 
 // constructor...
@@ -24,9 +26,6 @@ PanelScanner::PanelScanner()
     new_buttons[i] = 0;
   }
 
-  tick_counter = 0;
-  blink_phase = false;
-  slow_blink  = false;
 }
 
 void PanelScanner::initScanning()
@@ -47,25 +46,6 @@ void PanelScanner::tick()
 {
   doTransaction();
   parseButtons();
-
-  tick_counter++;
-
-  if(tick_counter < 5)
-  {
-    slow_blink = true;
-  }
-  else
-  {
-    slow_blink = false;
-  }
-
-  if (tick_counter == 20)
-  {
-    blink_phase = !blink_phase;
-
-
-    tick_counter = 0;
-  }
 }
 
 
@@ -347,9 +327,12 @@ void PanelScanner::doTransaction()
 
   //count++;
 
+  // Ask the player for 1/32 step info for sync'd blinking
+  bool blink_phase = thePlayer.getBlinkPhase();
+
   for (i = 0; i < NUM_PANELS; i++)
   {
-    if (slow_blink)
+    if (blink_phase)
     {
       trans_buffer[i] = led_half_buffer[i];
     }
