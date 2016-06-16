@@ -69,6 +69,12 @@ AudioEffectMultiply    cymbalmult;
 AudioMixer4            mixer1;
 AudioMixer4            mixer2;
 
+// Master volume control between mixers and output,
+// because the output level controls are independent between 
+// phones and line outputs.
+AudioEffectMultiply    mastervol;
+AudioSynthWaveformDc   volcontrol;        
+
 AudioOutputI2S           i2s1;           //xy=968,448
 
 #ifdef HAT
@@ -116,12 +122,13 @@ AudioConnection          patchCord52(cymbaldecay, 0, cymbalmult, 1);
 AudioConnection          patchCord97(cymbalmult, 0, mixer2, 3);
 #endif
 
-//AudioConnection          patchCord96(noise, 0, mixer2, 2);
-
 AudioConnection          patchCord93(mixer2, 0, mixer1, 3);
 
-AudioConnection          patchCord98(mixer1, 0, i2s1, 0);
-AudioConnection          patchCord99(mixer1, 0, i2s1, 1);
+AudioConnection          patchCord965(mixer1, 0, mastervol, 0);
+AudioConnection          patchCord966(volcontrol, 0 , mastervol, 1);
+
+AudioConnection          patchCord98(mastervol, 0, i2s1, 0);
+AudioConnection          patchCord99(mastervol, 0, i2s1, 1);
 
 AudioControlSGTL5000     sgtl5000_1;
 
@@ -140,7 +147,7 @@ void voiceInit()
 
   sgtl5000_1.enable();
   sgtl5000_1.volume(0.5);
-  sgtl5000_1.lineOutLevel(16);
+  sgtl5000_1.lineOutLevel(13);
 
   paramInit();
 
@@ -294,8 +301,8 @@ void paramUpdate3()
   uint32_t tempo;
 
   volume = analogRead(A20);
-
-  sgtl5000_1.volume(((float)volume)/0x3ff);
+  volume = (volume * volume) >> 10;
+  volcontrol.amplitude(((float)volume)/0x3ff, 3);
 
   tempo = analogRead(A15);
 
