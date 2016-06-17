@@ -18,6 +18,7 @@ extern Player thePlayer;
 #define SHAKER
 #define BELL
 #define CYMBAL
+#define CLAP
 
 // Used by multiple instruments:
 AudioSynthNoiseWhite   noise;
@@ -65,9 +66,17 @@ AudioFilterBiquad      cymbalfilter;
 AudioEffectMultiply    cymbalmult;
 #endif
 
+#ifdef CLAP
+AudioSynthDecay        clapdecay;
+AudioEffectMultiply    clapmult;
+AudioFilterBiquad      clapfilter;
+AudioEffectClapEnvelope clapenv;
+#endif
+
 // outputs
 AudioMixer4            mixer1;
 AudioMixer4            mixer2;
+AudioMixer4            mixer3;
 
 // Master volume control between mixers and output,
 // because the output level controls are independent between 
@@ -119,10 +128,20 @@ AudioConnection          patchCord95(shakemult, 0, mixer2, 1);
 AudioConnection          patchCord50(clat1, 0, cymbalfilter, 0);
 AudioConnection          patchCord51(cymbalfilter, cymbalmult);
 AudioConnection          patchCord52(cymbaldecay, 0, cymbalmult, 1);
-AudioConnection          patchCord97(cymbalmult, 0, mixer2, 3);
+AudioConnection          patchCord97(cymbalmult, 0, mixer3, 2);
+#endif
+
+#ifdef CLAP
+AudioConnection          patchCord60(noise, 0, clapenv, 0);
+AudioConnection          patchCord61(clapenv, 0, mixer3, 0);
+AudioConnection          patchCord62(noise, 0, clapfilter, 0);
+AudioConnection          patchCord63(clapfilter, 0, clapmult, 0);
+AudioConnection          patchCord64(clapdecay, 0, clapmult, 1);
+AudioConnection          patchCord65(clapmult, 0, mixer3, 1);
 #endif
 
 AudioConnection          patchCord93(mixer2, 0, mixer1, 3);
+AudioConnection          patchCord967(mixer3, 0, mixer2, 3);
 
 AudioConnection          patchCord965(mixer1, 0, mastervol, 0);
 AudioConnection          patchCord966(volcontrol, 0 , mastervol, 1);
@@ -143,10 +162,8 @@ void voiceInit()
 {
   AudioNoInterrupts();
 
-  //decay1.length(1000);
-
   sgtl5000_1.enable();
-  sgtl5000_1.volume(0.5);
+  sgtl5000_1.volume(0.7);
   sgtl5000_1.lineOutLevel(13);
 
   paramInit();
@@ -216,6 +233,14 @@ void paramInit()
   cymbalfilter.setLowpass(0, 4500, 0.3);
   cymbalfilter.setHighpass(1, 770, 0.7);
   cymbaldecay.length(1000);
+#endif
+
+#ifdef CLAP
+  clapdecay.length(200); 
+  mixer3.gain(0, 0.6);
+  mixer3.gain(1, 0.45);
+  clapfilter.setLowpass(0, 6500, 0.4);
+  clapfilter.setHighpass(1, 200, 0.3);
 #endif
 
   // Master
@@ -391,8 +416,14 @@ void triggerBell(bool loud)
 
 void triggerCymbal(bool loud)
 {
-  Serial.println("cymbal");
-  
   cymbaldecay.noteOn(loud?0x7fff:0x6000);
+}
+
+void triggerClap(bool loud)
+{
+//  Serial.println("cymbal");
+  
+  clapdecay.noteOn(loud?0x7fff:0x6000);
+  clapenv.noteOn();
 }
 

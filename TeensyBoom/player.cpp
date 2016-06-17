@@ -279,7 +279,7 @@ void Player::tick()
 
     theEditor.forceLEDs();
 
-#if 1
+#if 0
    Serial.print("Trigger: step#");
    Serial.print(current_step);
    Serial.print(" bitmap:");
@@ -328,6 +328,10 @@ void Player::tick()
     if (trigdata & 0x200)
     {
       triggerCymbal(trigdata & 0x2000000);
+    }
+    if (trigdata & 0x400)
+    {
+      triggerClap(trigdata & 0x4000000);
     }
     AudioInterrupts();
   }

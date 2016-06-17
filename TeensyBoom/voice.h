@@ -21,5 +21,6 @@ void triggerShaker(bool loud = true);
 void triggerHat(bool open, bool loud = true);
 void triggerBell(bool loud = true);
 void triggerCymbal(bool loud = true);
+void triggerClap(bool loud = true);
 
 #endif // keepout

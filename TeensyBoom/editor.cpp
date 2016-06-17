@@ -86,7 +86,7 @@ void Editor::setMode(EditorMode newmode)
 
 void Editor::receiveKey(uint32_t keynum, bool pressed)
 {
-#if 1
+#if 0
   Serial.print("Ed Key: ");
   Serial.print(keynum, HEX);
   Serial.print(" ");

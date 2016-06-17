@@ -9,6 +9,6 @@
 #include "Synth-Clatter.h"
 #include "Synth-Decay.h"
 #include "Synth-DrumHeart.h"
-
+#include "Effect-ClapEnv.h"
 
 #endif

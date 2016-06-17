@@ -283,7 +283,7 @@ void VoiceSelect::HandleKey(uint32_t keynum, bool pressed)
   {
     HandlePlayButton(pressed);
   }
-  else if((keynum >= 0) && (keynum <= 9))
+  else if((keynum >= 0) && (keynum <= 10))
   {
     // TBD - more voices means accept more input
     if(pressed)
@@ -355,7 +355,7 @@ void MuteSelect::HandleKey(uint32_t keynum, bool pressed)
     }
   }
 
-  else if((keynum >= 0) && (keynum <= 9))
+  else if((keynum >= 0) && (keynum <= 10))
   {
     if(pressed)
     {
