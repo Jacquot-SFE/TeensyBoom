@@ -215,8 +215,6 @@ void paramInit()
   // tom
   //tom.frequency(80);
   t1 = 60;
-  t2 = 90;
-  t3 = 135;
   tom.secondMix(1.0);
   tom.length(250);
   tom.pitchMod(0.75);
@@ -230,15 +228,16 @@ void paramInit()
 #endif
 
 #ifdef CYMBAL
-  cymbalfilter.setLowpass(0, 4500, 0.3);
-  cymbalfilter.setHighpass(1, 770, 0.7);
+  //cymbalfilter.setLowpass(0, 4500, 0.3);
+  //cymbalfilter.setHighpass(1, 770, 0.7);
+  cymbalfilter.setBandpass(0, 3000, .2);
   cymbaldecay.length(1000);
 #endif
 
 #ifdef CLAP
   clapdecay.length(200); 
-  mixer3.gain(0, 0.6);
-  mixer3.gain(1, 0.45);
+  mixer3.gain(0, 0.5);
+  mixer3.gain(1, 0.4);
   clapfilter.setLowpass(0, 6500, 0.4);
   clapfilter.setHighpass(1, 200, 0.3);
 #endif
@@ -248,10 +247,14 @@ void paramInit()
   mixer1.gain(1, 0.75);// kik
   mixer1.gain(2, 0.65);// snr
   mixer1.gain(3, 0.75);// mix2
+  
   mixer2.gain(0, 0.75);// tom
   mixer2.gain(1, 0.3);//shaker
   mixer2.gain(2, 0.5);// bell
-  mixer2.gain(3, 0.5);// cymbal
+  mixer2.gain(3, 0.75);// mix3
+
+  // 0 and 1 are set in the clap portion, above.
+  mixer3.gain(2, 0.75);//cymbal
 }
 
 void paramUpdate1()
@@ -292,29 +295,33 @@ void paramUpdate1()
 
 void paramUpdate2()
 {
-  uint16_t   p1, p2, p3;
+  uint16_t   p1;
   uint16_t  len, mod;
   uint16_t  secondskin;
-  //uint16_t  slen;
+  uint16_t  tonebal, cymlen;;
 
-  p1 = analogRead(A7);
-  p2 = analogRead(A10);
-  p3 = analogRead(A11);
+  p1 = analogRead(A10);
+  secondskin = analogRead(A11);
 
-  len = analogRead(A17);
   mod = analogRead(A18);
-  secondskin = analogRead(A19);
+  len = analogRead(A19);
 
-  //slen = analogRead(A11);
+  tonebal = analogRead(A7);
+  cymlen =  analogRead(A17);
 
-  t1 = 30 + (p1 >> 1);
-  t2 = 30 + (p2 >> 1);
-  t3 = 30 + (p3 >> 1);
+  // toms pitched as minor triad from base 
+  t3 = 30 + (p1 >> 1);
+  t2 = (t3 * 6)/5;    // 6/5 = minor 3rd
+  t1 = t3 + (t3 >> 1);// 3/2 = perfect 5th 
 
   tom.length(len + 10);
   tom.pitchMod((float)mod/0x3ff);
   tom.secondMix((float)secondskin/0x3ff);
 
+  cymbaldecay.length((cymlen*4) + 50);
+  cymbalfilter.setLowpass(0, 600+(tonebal*3), 0.3);
+  cymbalfilter.setHighpass(1, 600+tonebal, 0.2);
+  
   //shakedecay.length(slen + 10);
 }
 #endif
