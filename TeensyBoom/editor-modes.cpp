@@ -300,6 +300,8 @@ void VoiceSelect::setLEDs(bool entry)
   
   if(entry)
   {
+    theScanner.clearAllBackgroundLEDs();
+    
     doPlayingLed();
     
     // Mode indication
